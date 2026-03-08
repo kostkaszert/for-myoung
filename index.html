@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>미영씨를 위한 선물</title>
+    <style>
+        /* 아까 드린 CSS 코드를 여기에 붙여넣으세요 */
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div id="text-container">
+        <h1 id="love-text">넘나 이쁜 나의 미영씨</h1>
+    </div>
+    <div class="hearts-container"></div>
+
+    <style>
+        body {
+            background-color: #000; /* 어두운 배경에서 효과가 극대화됩니다 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #love-text {
+            font-size: 4rem;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            text-shadow: 0 0 10px #ff007f, 0 0 20px #ff007f;
+            user-select: none; /* 드래그 방지 */
+        }
+
+        /* 하트 애니메이션 추가 */
+        @keyframes fall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+        .heart {
+            position: absolute;
+            color: #ff007f;
+            font-size: 20px;
+            animation: fall 5s linear infinite;
+        }
+    </style>
+
+    <div id="player" style="display:none"></div>
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+    <script>
+    let player;
+    let isApiReady = false; // API 준비 상태 확인용
+
+    function onYouTubeIframeAPIReady() {
+        player = new YT.Player('player', {
+            height: '0',
+            width: '0',
+            videoId: '1S5xRPZBMy0',
+            playerVars: {
+                'autoplay': 0,
+                'controls': 0,
+                'loop': 1,
+                'playlist': '1S5xRPZBMy0',
+                'origin': window.location.origin // 보안 정책 관련 추가
+            },
+            events: {
+                'onReady': (event) => {
+                    isApiReady = true;
+                    event.target.setVolume(70); // 볼륨을 70%로 설정
+                }
+            }
+        });
+    }
+
+    const text = document.getElementById('love-text');
+    const originalText = "넘나 이쁜 나의 미영씨";
+    const toggleText = "공부해요!";
+
+    text.addEventListener('click', () => {
+        // API가 준비되었을 때만 재생 실행
+        if (isApiReady && player && player.playVideo) {
+            player.playVideo();
+        } else {
+            console.log("유튜브 음악이 아직 준비 중입니다. 잠시 후 다시 클릭해 주세요!");
+        }
+
+        if (text.innerText === originalText) {
+            text.innerText = toggleText;
+            text.style.color = '#ffeb3b';
+        } else {
+            text.innerText = originalText;
+            text.style.color = '#fff';
+        }
+    });
+
+    // 마우스 아웃 효과 (기존과 동일)
+    text.addEventListener('mouseout', () => {
+        text.innerText = originalText;
+        text.style.transform = 'scale(1) rotate(0deg)';
+        text.style.color = '#fff';
+    });
+
+    // 둥둥 떠다니는 효과 (기존과 동일)
+    let angle = 0;
+    const floatEffect = () => {
+        angle += 0.05;
+        text.style.marginTop = `${Math.sin(angle) * 15}px`;
+        requestAnimationFrame(floatEffect);
+    };
+
+    setInterval(() => {
+    const heart = document.createElement('div');
+    heart.classList.add('heart');
+    heart.innerHTML = '❤️';
+    heart.style.left = Math.random() * 100 + 'vw';
+    heart.style.animationDuration = (Math.random() * 3 + 2) + 's';
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 5000);
+    }, 300);
+
+    floatEffect();
+    </script>
+</body>
+</html>
