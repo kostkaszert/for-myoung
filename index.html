@@ -1,39 +1,42 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
+    <meta charset="UTF-8">
     <title>미영씨를 위한 선물</title>
-    <style>
-        /* 아까 드린 CSS 코드를 여기에 붙여넣으세요 */
-    </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body>
-    <div id="text-container">
-        <h1 id="love-text">넘나 이쁜 나의 미영씨</h1>
-    </div>
-    <div class="hearts-container"></div>
-
     <style>
         body {
-            background-color: #000; /* 어두운 배경에서 효과가 극대화됩니다 */
+            background-color: #000;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
+            padding: 0 20px; /* 모바일 대응 */
             overflow: hidden;
+            text-align: center;
+        }
+
+        #text-container {
+            width: 100%;
+            z-index: 10;
         }
 
         #love-text {
-            font-size: 4rem;
+            font-size: 2.5rem; /* 모바일 고려하여 기본 크기 조정 */
             color: #fff;
             cursor: pointer;
             transition: all 0.5s ease;
             text-shadow: 0 0 10px #ff007f, 0 0 20px #ff007f;
-            user-select: none; /* 드래그 방지 */
+            user-select: none;
+            word-break: keep-all; /* 단어 단위 줄바꿈 */
         }
 
-        /* 하트 애니메이션 추가 */
+        /* 데스크탑에서는 글씨를 더 크게 */
+        @media (min-width: 768px) {
+            #love-text { font-size: 4rem; }
+        }
+
         @keyframes fall {
             0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
             100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
@@ -43,8 +46,14 @@
             color: #ff007f;
             font-size: 20px;
             animation: fall 5s linear infinite;
+            pointer-events: none;
         }
     </style>
+</head>
+<body>
+    <div id="text-container">
+        <h1 id="love-text">넘나 이쁜 나의 미영씨</h1>
+    </div>
 
     <div id="player" style="display:none"></div>
 
@@ -52,8 +61,9 @@
 
     <script>
     let player;
-    let isApiReady = false; // API 준비 상태 확인용
+    let isApiReady = false;
 
+    // 1. 유튜브 API 준비
     function onYouTubeIframeAPIReady() {
         player = new YT.Player('player', {
             height: '0',
@@ -64,64 +74,101 @@
                 'controls': 0,
                 'loop': 1,
                 'playlist': '1S5xRPZBMy0',
-                'origin': window.location.origin // 보안 정책 관련 추가
+                'origin': window.location.origin
             },
             events: {
                 'onReady': (event) => {
                     isApiReady = true;
-                    event.target.setVolume(70); // 볼륨을 70%로 설정
+                    event.target.setVolume(70);
                 }
             }
         });
     }
 
-    const text = document.getElementById('love-text');
-    const originalText = "넘나 이쁜 나의 미영씨";
-    const toggleText = "공부해요!";
+    const textElement = document.getElementById('love-text');
+    
+    // 보여줄 문구 순서대로 배열 생성
+    const messages = [
+        "넘나 이쁜 나의 미영씨",
+        "사랑해요!!",
+        "음..",
+        "내가 미영씨 얼마나 사랑하는지 알까요?",
+        "모를까요?",
+        "음..",
+        "모른다고요?",
+        "안돼!!!!!!!!!!!",
+        "미영씨는 내꺼야!!!!!!!!!!!!!!!!!!!",
+        "ㅋㅋㅋ",
+        "미영씨~",
+        "보고싶어요",
+        "지금은 이렇게 유치뽕짝이지만",
+        "나중엔 근사한거 보여줄게요~",
+        "심심해서 만들어 봤어요ㅎㅎ",
+        "사랑해요~^^"
+    ];
 
-    text.addEventListener('click', () => {
-        // API가 준비되었을 때만 재생 실행
+    let currentIndex = 0;
+
+    // 2. 클릭 시 문구 변경 및 음악 재생
+    textElement.addEventListener('click', () => {
+        // 첫 클릭 시 음악 재생 시작
         if (isApiReady && player && player.playVideo) {
             player.playVideo();
-        } else {
-            console.log("유튜브 음악이 아직 준비 중입니다. 잠시 후 다시 클릭해 주세요!");
         }
 
-        if (text.innerText === originalText) {
-            text.innerText = toggleText;
-            text.style.color = '#ffeb3b';
-        } else {
-            text.innerText = originalText;
-            text.style.color = '#fff';
+        // 인덱스 증가 및 문구 교체
+        currentIndex++;
+        if (currentIndex >= messages.length) {
+            currentIndex = messages.length - 1; // 마지막 문구에서 멈춤
         }
+        
+        updateText();
     });
 
-    // 마우스 아웃 효과 (기존과 동일)
-    text.addEventListener('mouseout', () => {
-        text.innerText = originalText;
-        text.style.transform = 'scale(1) rotate(0deg)';
-        text.style.color = '#fff';
+    // 3. 더블클릭 시 처음으로 돌아가기
+    window.addEventListener('dblclick', () => {
+        currentIndex = 0;
+        updateText();
     });
 
-    // 둥둥 떠다니는 효과 (기존과 동일)
+    function updateText() {
+        textElement.innerText = messages[currentIndex];
+        
+        // 특정 문구에서 강조 효과 (색상 변경 등)
+        if (currentIndex === 1 || currentIndex === 8 || currentIndex === 15) {
+            textElement.style.color = '#ffeb3b'; // 노란색 강조
+        } else {
+            textElement.style.color = '#fff';
+        }
+    }
+
+    // 4. 마우스 효과 및 둥둥 떠다니는 효과
+    textElement.addEventListener('mouseover', () => {
+        textElement.style.transform = 'scale(1.1) rotate(2deg)';
+    });
+
+    textElement.addEventListener('mouseout', () => {
+        textElement.style.transform = 'scale(1) rotate(0deg)';
+    });
+
     let angle = 0;
     const floatEffect = () => {
         angle += 0.05;
-        text.style.marginTop = `${Math.sin(angle) * 15}px`;
+        textElement.style.marginTop = `${Math.sin(angle) * 15}px`;
         requestAnimationFrame(floatEffect);
     };
-
-    setInterval(() => {
-    const heart = document.createElement('div');
-    heart.classList.add('heart');
-    heart.innerHTML = '❤️';
-    heart.style.left = Math.random() * 100 + 'vw';
-    heart.style.animationDuration = (Math.random() * 3 + 2) + 's';
-    document.body.appendChild(heart);
-    setTimeout(() => heart.remove(), 5000);
-    }, 300);
-
     floatEffect();
+
+    // 5. 하트 생성기
+    setInterval(() => {
+        const heart = document.createElement('div');
+        heart.classList.add('heart');
+        heart.innerHTML = '❤️';
+        heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 5000);
+    }, 400);
     </script>
 </body>
 </html>
